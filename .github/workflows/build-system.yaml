@@ -1,0 +1,38 @@
+name: Build-IRSL-system
+#
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+#  pull_request:
+#    branches: [main]
+#  schedule:
+#    - cron: '30 2 * * 4'
+
+jobs:
+  build:
+    runs-on: self-hosted
+    env:
+#      DOCKER_LOCAL: ghcr.io/
+#      DOCKER_LOCAL: repo.irsl.eiiris.tut.ac.jp/
+      DOCKER_DEPLOY: repo.irsl.eiiris.tut.ac.jp/
+    steps:
+      - name: Dispatch
+        env:
+          GITHUB_TOKEN: ${{ secrets.IRSL_PAT_CLS }}
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.IRSL_PAT_CLS }}
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: 'IRSL-tut',
+              repo: 'irsl_docker_irsl_system',
+              ref: 'main',
+              workflow_id: 'build-irsl-system.yaml',
+              inputs: {
+                event_type: 'build_all',
+                source: 'irsl_python_lib',
+                hash: '${{ github.sha }}'
+              }
+            })
+      - run: echo "🍏 This job's status is ${{ job.status }}."

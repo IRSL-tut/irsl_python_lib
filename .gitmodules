@@ -1,0 +1,3 @@
+[submodule "irsl_robots/jvrc1_model"]
+	path = irsl_robots/jvrc1_model
+	url = https://github.com/IRSL-tut/jvrc1_model

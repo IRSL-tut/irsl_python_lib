@@ -24,12 +24,13 @@ class MakeRandomTerrain(object):
             random_seed (int): The random seed generated using the monotonic clock.
 
         Examples:
+            >>>> from irsl_cnoid.make_surface.make_random_surface import MakeRandomTerrain
             >>>> mr=MakeRandomTerrain(8.0, 4.0)
-            >>>> for i in range(40):
+            >>>> for i in range(20):
             >>>>     mr.addRandomTerrain(sizeRange=(0.4, 3.0), heightRange=(-0.05, 0.05))
             >>>> mr.gaussianBlur(0.1)
             >>>> res=mr.makeGridSurface()
-            >>>> ## res=mr.makeRandomSurface(40, sizeRange=(0.4, 3.0), heightRange=(-0.05, 0.05))
+            >>>> ## res=mr.makeRandomSurface(20, blur=0.1, sizeRange=(0.4, 3.0), heightRange=(-0.05, 0.05))
             >>>> di=DrawInterface()
             >>>> di.clear()
             >>>> di.addObject(res)
@@ -198,22 +199,31 @@ class MakeRandomTerrain(object):
         if gby % 2 == 0:
             gby += 1
         self.rawarray = cv2.GaussianBlur(self.rawarray, (gbx, gby), 0)
-    def makeGridSurface(self):
+    def makeGridSurface(self, transformOrigin=True):
         """
         Generates a grid surface based on elevation data and applies transformations.
 
         This method creates an elevation grid using the specified dimensions and resolution,
         reshapes the raw elevation data, and applies a rotation and translation to the grid.
 
+        Args:
+            transformOrigin (boolean, default=True) : If True, transform the origin of the mesh. Otherwise, transform coordinates of viewing object
+
         Returns:
             object: The transformed elevation grid object.
         """
         res = mkshapes.makeElevationGrid(self.isizex, self.isizey, self.resX, self.resY,
                                          self.rawarray.reshape(self.isizex*self.isizey).tolist())
-        res.rotate(PI/2, coordinates.X)
-        res.translate(np.array([-0.5*self.sizex, 0.5*self.sizey, 0]), wrt=coordinates.world)
+        cds = coordinates()
+        cds.rotate(PI/2, coordinates.X)
+        cds.translate(np.array([-0.5*self.sizex, 0.5*self.sizey, 0]), wrt=coordinates.world)
+        if transformOrigin:
+            shape = mkshapes.extractShapes(res.target)[0][0]
+            shape.mesh.transform(cds.cnoidPosition)
+        else:
+            res.newcoords(cds)
         return res
-    def makeRandomSurface(self, numberOfBumps=10, blur=None, positionRange=None, sizeRange=(0.01, 2.0), heightRange=(-0.1, 0.1)):
+    def makeRandomSurface(self, numberOfBumps=10, blur=None, positionRange=None, sizeRange=(0.01, 2.0), heightRange=(-0.1, 0.1), transformOrigin=True):
         """
         Generates a random surface by adding multiple random terrain bumps and optionally applying a Gaussian blur.
 
@@ -223,6 +233,7 @@ class MakeRandomTerrain(object):
             positionRange (tuple or None, optional): The range of positions for the bumps as (min, max). If None, the default range is used. Defaults to None.
             sizeRange (tuple, optional): The range of sizes for the bumps as (min, max). Defaults to (0.01, 2.0).
             heightRange (tuple, optional): The range of heights for the bumps as (min, max). Defaults to (-0.1, 0.1).
+            transformOrigin (boolean, default=True) : If True, transform the origin of the mesh. Otherwise, transform coordinates of viewing object
 
         Returns:
             object: A grid surface object representing the generated random surface.
@@ -231,7 +242,7 @@ class MakeRandomTerrain(object):
             self.addRandomTerrain(positionRange=positionRange, sizeRange=sizeRange, heightRange=heightRange)
         if blur is not None:
             self.gaussianBlur(blur)
-        return self.makeGridSurface()
+        return self.makeGridSurface(transformOrigin=transformOrigin)
 ####
 ##mr=MakeRandomTerrain(8.0, 4.0)
 ###mr.makeArray(8.0, 4.0)

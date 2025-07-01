@@ -1,3 +1,7 @@
 [submodule "irsl_robots/jvrc1_model"]
 	path = irsl_robots/jvrc1_model
 	url = https://github.com/IRSL-tut/jvrc1_model
+[submodule "irsl/filter/imu_tools"]
+	path = irsl/filter/imu_tools
+	url = https://github.com/IRSL-tut/imu_tools
+	branch = python_binding

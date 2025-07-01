@@ -1,6 +1,59 @@
 from scipy.signal import iirfilter
 import numpy as np
 
+"""
+## Example of IIRFilter and VectorFilter
+
+import matplotlib.pyplot as plt
+import irsl.filter.iirfilter
+import numpy as np
+from irsl.filter.iirfilter import IIRFilter
+from irsl.filter.iirfilter import VectorFilter
+if True:
+    # Example usage of IIRFilter
+    fs = 1000.0  # Sampling frequency in Hz
+    N = 4       # Filter order
+    Wn = 100.0   # Cutoff frequency in Hz
+    duration = 0.5  # Signal duration in seconds
+    t = np.linspace(0, duration, int(fs * duration), endpoint=False)  # Time vector
+    signal = np.sin(2 * np.pi * 25.0 * t) + 0.4 * np.sin(2 * np.pi * 200.0 * t)  # Example signal
+    iir_filter = IIRFilter(N, Wn, fs, btype='lowpass')
+    filtered_signal = np.array([iir_filter.filter(val) for val in signal])
+    # Plot the original and filtered signals
+    plt.figure()
+    plt.plot(t, signal, label="Original Signal")
+    plt.plot(t, filtered_signal, label="Filtered Signal", linestyle='--')
+    plt.xlabel("Time [s]")
+    plt.ylabel("Amplitude")
+    plt.title("IIR Filter Example")
+    plt.legend()
+    plt.grid()
+    plt.show()
+if True:
+    # Example usage of VectorFilter
+    fs = 1000.0  # Sampling frequency in Hz
+    N = 3       # Filter order
+    Wn = 250.0   # Cutoff frequency in Hz
+    duration = 0.5  # Signal duration in seconds
+    vector_size = 3
+    vector_filter = VectorFilter(vector_size, N, Wn, fs, btype='lowpass')
+    vector_signal = np.array([ np.sin(2 * np.pi * 60.0 * t), np.sin(2 * np.pi * 120.0 * t), np.sin(2 * np.pi * 200.0 * t) ]).T
+    filtered_vector_signal = np.array([ vector_filter.filter(vec) for vec in vector_signal ])
+    # Plot the original and filtered vector signals
+    plt.figure()
+    for i in range(vector_size):
+        plt.subplot(vector_size, 1, i + 1)
+        plt.plot(t, vector_signal[:, i], label=f"Original Signal {i+1}")
+        plt.plot(t, filtered_vector_signal[:, i], label=f"Filtered Signal {i+1}", linestyle='--')
+        plt.xlabel("Time [s]")
+        plt.ylabel("Amplitude")
+        plt.title(f"Signal {i+1}")
+        plt.legend()
+        plt.grid()
+    plt.tight_layout()
+    plt.show()
+"""
+
 class IIRFilter(object):
     def __init__(self, N, Wn, fs, btype='lowpass', **kwargs):
         """
@@ -164,51 +217,3 @@ class VectorFilter(object):
             for f in self.filters:
                 f.reset()
 
-#import matplotlib.pyplot as plt
-#import irsl.filter.iirfilter
-#import numpy as np
-#from irsl.filter.iirfilter import IIRFilter
-#from irsl.filter.iirfilter import VectorFilter
-#if True:
-#    # Example usage of IIRFilter
-#    fs = 1000.0  # Sampling frequency in Hz
-#    N = 4       # Filter order
-#    Wn = 100.0   # Cutoff frequency in Hz
-#    duration = 0.5  # Signal duration in seconds
-#    t = np.linspace(0, duration, int(fs * duration), endpoint=False)  # Time vector
-#    signal = np.sin(2 * np.pi * 25.0 * t) + 0.4 * np.sin(2 * np.pi * 200.0 * t)  # Example signal
-#    iir_filter = IIRFilter(N, Wn, fs, btype='lowpass')
-#    filtered_signal = np.array([iir_filter.filter(val) for val in signal])
-#    # Plot the original and filtered signals
-#    plt.figure()
-#    plt.plot(t, signal, label="Original Signal")
-#    plt.plot(t, filtered_signal, label="Filtered Signal", linestyle='--')
-#    plt.xlabel("Time [s]")
-#    plt.ylabel("Amplitude")
-#    plt.title("IIR Filter Example")
-#    plt.legend()
-#    plt.grid()
-#    plt.show()
-#if True:
-#    # Example usage of VectorFilter
-#    fs = 1000.0  # Sampling frequency in Hz
-#    N = 3       # Filter order
-#    Wn = 250.0   # Cutoff frequency in Hz
-#    duration = 0.5  # Signal duration in seconds
-#    vector_size = 3
-#    vector_filter = VectorFilter(vector_size, N, Wn, fs, btype='lowpass')
-#    vector_signal = np.array([ np.sin(2 * np.pi * 60.0 * t), np.sin(2 * np.pi * 120.0 * t), np.sin(2 * np.pi * 200.0 * t) ]).T
-#    filtered_vector_signal = np.array([ vector_filter.filter(vec) for vec in vector_signal ])
-#    # Plot the original and filtered vector signals
-#    plt.figure()
-#    for i in range(vector_size):
-#        plt.subplot(vector_size, 1, i + 1)
-#        plt.plot(t, vector_signal[:, i], label=f"Original Signal {i+1}")
-#        plt.plot(t, filtered_vector_signal[:, i], label=f"Filtered Signal {i+1}", linestyle='--')
-#        plt.xlabel("Time [s]")
-#        plt.ylabel("Amplitude")
-#        plt.title(f"Signal {i+1}")
-#        plt.legend()
-#        plt.grid()
-#    plt.tight_layout()
-#    plt.show()

@@ -635,6 +635,8 @@ class RobotTree(nx.DiGraph):
                 jointd['type'] = jtype
                 jointd['axis'] = l.jointAxis.tolist()
                 jointd['id']   = l.jointId
+                if l.jointName != l.name:
+                    jointd['name'] = l.jointName
                 params['joint'] = jointd
                 self.add_node(l.name, params=params, coords=coordinates(l.T))
                 p = l.getParent()

@@ -761,7 +761,7 @@ def makeShape(module, primitive=None, args=None, coords=None):
     elif primitive == 'cylinder':
         _gfunc = module.makeCylinder
     elif primitive == 'sphere':
-        _gfunc = module.makeCylinder
+        _gfunc = module.makeSphere
     elif primitive == 'cone':
         _gfunc = module.makeCone
     elif primitive == 'capsule':

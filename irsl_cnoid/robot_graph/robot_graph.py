@@ -909,6 +909,9 @@ class RobotTreeBuilder(RobotBuilder):
         args = {}
         if 'args' in jp:
             args = jp['args']
+            if not 'density' in args:
+                args['density'] = self.default_density
+
         ## override joint-id
         jid = self.cur_id
         if 'id' in jp:
@@ -939,7 +942,6 @@ class RobotTreeBuilder(RobotBuilder):
                                       JointName=jname,
                                       parentLink = parent_lk,
                                       JointId = jid,
-                                      density = self.default_density,
                                       overwriteMassparam=massParam,
                                       **args)
         if jtype == 'fixed':

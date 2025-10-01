@@ -332,7 +332,7 @@ class RobotTree(nx.DiGraph):
         if len(lst) < 1:
             return
         if parent is None:
-            if ( add_root or (type(lst[0]) is list)  or RobotTree.check_type(lst[0]) == 1 ) and (RobotTree.check_type(lst[0]) != 1 or lst[0]['joint']['type'] == 'root'):
+            if ( add_root or (type(lst[0]) is list)  or RobotTree.check_type(lst[0]) == 1 ) and (RobotTree.check_type(lst[0]) == 1 or lst[0]['joint']['type'] == 'root'):
                 parent={'node': 'Root', 'type': 'link', 'joint': {'type': 'root'}}
             else:
                 parent=lst[0]

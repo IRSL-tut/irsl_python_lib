@@ -332,7 +332,7 @@ class RobotTree(nx.DiGraph):
         if len(lst) < 1:
             return
         if parent is None:
-            if ( add_root or (type(lst[0]) is list)  or RobotTree.check_type(lst[0]) == 1 ) and (RobotTree.check_type(lst[0]) != 1 or lst[0]['joint']['type'] == 'root'):
+            if ( add_root or (type(lst[0]) is list)  or RobotTree.check_type(lst[0]) == 1 ) and (RobotTree.check_type(lst[0]) == 1 or lst[0]['joint']['type'] == 'root'):
                 parent={'node': 'Root', 'type': 'link', 'joint': {'type': 'root'}}
             else:
                 parent=lst[0]
@@ -635,6 +635,8 @@ class RobotTree(nx.DiGraph):
                 jointd['type'] = jtype
                 jointd['axis'] = l.jointAxis.tolist()
                 jointd['id']   = l.jointId
+                if l.jointName != l.name:
+                    jointd['name'] = l.jointName
                 params['joint'] = jointd
                 self.add_node(l.name, params=params, coords=coordinates(l.T))
                 p = l.getParent()
@@ -761,7 +763,7 @@ def makeShape(module, primitive=None, args=None, coords=None):
     elif primitive == 'cylinder':
         _gfunc = module.makeCylinder
     elif primitive == 'sphere':
-        _gfunc = module.makeCylinder
+        _gfunc = module.makeSphere
     elif primitive == 'cone':
         _gfunc = module.makeCone
     elif primitive == 'capsule':
@@ -909,6 +911,9 @@ class RobotTreeBuilder(RobotBuilder):
         args = {}
         if 'args' in jp:
             args = jp['args']
+            if not 'density' in args:
+                args['density'] = self.default_density
+
         ## override joint-id
         jid = self.cur_id
         if 'id' in jp:
@@ -939,7 +944,6 @@ class RobotTreeBuilder(RobotBuilder):
                                       JointName=jname,
                                       parentLink = parent_lk,
                                       JointId = jid,
-                                      density = self.default_density,
                                       overwriteMassparam=massParam,
                                       **args)
         if jtype == 'fixed':

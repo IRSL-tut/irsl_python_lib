@@ -5,3 +5,6 @@
 	path = irsl/filter/imu_tools
 	url = https://github.com/IRSL-tut/imu_tools
 	branch = python_binding
+[submodule "irsl_robots/unitree_models"]
+	path = irsl_robots/unitree_models
+	url = https://github.com/IRSL-tut/unitree_models.git

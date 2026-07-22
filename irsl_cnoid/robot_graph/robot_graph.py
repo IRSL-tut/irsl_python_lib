@@ -629,12 +629,23 @@ class RobotTree(nx.DiGraph):
                     pass
                 elif jtype == 'fixed':
                     pass
+                elif jtype == 'free':
+                    pass
                 else:
                     raise Exception('unknown joint type: {}'.format(jtype))
                 jointd = {}
                 jointd['type'] = jtype
-                jointd['axis'] = l.jointAxis.tolist()
                 jointd['id']   = l.jointId
+                jointd['axis'] = l.jointAxis.tolist()
+                if jtype != 'fixed' and jtype != 'free':
+                    args = {}
+                    ## jointd['axis'] = l.jointAxis.tolist() ## move to here??
+                    args['JointRange'] = [l.q_lower, l.q_upper]
+                    args['JointVelocityRange'] = [l.dq_lower, l.dq_upper]
+                    args['JointEffortRange'] = [l.u_lower, l.u_upper]
+                    # args['InitialJointAngle'] = 
+                    # args['EquivalentRotorInertia'] = 
+                    jointd['args'] = args
                 if l.jointName != l.name:
                     jointd['name'] = l.jointName
                 params['joint'] = jointd
@@ -801,6 +812,7 @@ class RobotTreeBuilder(RobotBuilder):
         self.default_velocity_range = [-PI*10, PI*10]
         self.default_effort_range   = [-100, 100]
         self.scale = 1.0
+        self._newSyle_ = True
     #
     def makeShapeFromParam(self, primitive=None, args=None, coords=None):
         return makeShape(self, primitive=primitive, args=args, coords=coords)
@@ -895,14 +907,17 @@ class RobotTreeBuilder(RobotBuilder):
             _build_jtype = RobotBuilder.JointType.Ball
         elif jtype == 'free' or jtype == 'root':
             pass
-        #
-        j  = self.createJointShape(jointType=_build_jtype)
-        ##
-        j.newcoords(cds)
-        if 'axis' in jp:
-            axis = jp['axis']
-            trs = _axis_to_rotation(axis)
-            j.transform(trs)
+        if self._newSyle_:
+            axis = npa( jp['axis'] ) if 'axis' in jp else None
+            j  = self.createJointShape(jointType=_build_jtype, axis=axis)
+            j.newcoords(cds)
+        else: ## old stype
+            j  = self.createJointShape(jointType=_build_jtype)
+            j.newcoords(cds)
+            if 'axis' in jp:
+                axis = jp['axis']
+                trs = _axis_to_rotation(axis)
+                j.transform(trs)
         ##
         name  =link_node
         jname = link_node

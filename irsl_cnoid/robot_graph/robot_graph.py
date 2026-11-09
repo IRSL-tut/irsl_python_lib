@@ -144,10 +144,10 @@ def _func_links(parent_coords, child_coords, scale=1.0, color=None, **kwargs): #
                 'args': {'x': 0.12*scale, 'y': len_, 'z': 0.12*scale, 'color': [0, 1, 0] },
                 }
     return (cds, geometry)
-def _func_links_cylinder(parent_coords, child_coords, scale=1.0, color=None, **kwargs):
+def _func_links_cylinder(parent_coords, child_coords, scale=1.0, color=None, threshold=1.e-5, **kwargs):
     direction = child_coords.pos - parent_coords.pos
     len_ = np.linalg.norm(direction)
-    if len_ < 1.e-5:
+    if len_ < threshold:
         return (None, None)
     cds = ru.axisAlignedCoords(direction, coordinates.Y)
     cds.pos = parent_coords.pos
@@ -703,11 +703,13 @@ class RobotTree(nx.DiGraph):
             #result['coords']   = coords
         return (result, coords)
 
-    def add_geometries_for_joints(self, scale=1.0):
+    def add_geometries_for_joints(self, scale=1.0, white_list=None):
         """
         """
         nodes = list(self.nodes)
         for node in nodes:
+            if white_list is not None and not node in white_list:
+                continue
             if self.check_node_type(node) == 0: ## link
                 succ = list(self.successors(node))
                 pred = list(self.predecessors(node))
@@ -749,11 +751,13 @@ class RobotTree(nx.DiGraph):
             self.add_node(name, params=gparams, coords=coords)
             self.add_edge(parent, name) ## parallel
 
-    def add_geometries_for_links(self, scale=1.0):
+    def add_geometries_for_links(self, scale=1.0, white_list=None):
         """
         """
         links = [ n for n in self.nodes if self.check_node_type(n) == 0 ]
         for l in links:
+            if white_list is not None and not l in white_list:
+                continue
             clinks = _flatten(self.search_direct_child_links(l))
             for c in clinks:
                 self._add_geometry_bw_links(l, c, scale=scale)

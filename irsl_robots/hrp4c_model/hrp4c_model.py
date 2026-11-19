@@ -1,5 +1,9 @@
 import os
-exec(open('/choreonoid_ws/install/share/irsl_choreonoid/sample/irsl_import.py').read())
+#exec(open('/choreonoid_ws/install/share/irsl_choreonoid/sample/irsl_import.py').read())
+from cnoid.IRSLCoords import coordinates
+from irsl_choreonoid.cnoid_util import fv ## for npa
+import irsl_choreonoid.robot_util as ru
+import irsl_choreonoid.cnoid_util as iu
 
 class HRP4C(ru.ImportedRobotModel):
     def __init__(self, robot=None, item=True, world=False, **kwargs):
